@@ -6,5 +6,72 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <form id="inputForm">
+        <input type="text" id="yearValue" name="yearValue" placeholder="Enter Year value">
+        <input type="text" id="countryCode" name="countryCode" placeholder="Enter countryCode value">
+        <button type="submit">Submit</button>
+    </form>
 </div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <table id="holidayTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Local Name</th>
+                        <th>Name</th>
+                        <th>Country Code</th>
+                        <th>Fixed</th>
+                        <th>Global</th>
+                        <th>Types</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#inputForm").submit(function (e) {
+            debugger;
+            e.preventDefault();
+            var yearValue = $("#yearValue").val();
+            var countryCode = $("#countryCode").val();
+
+            $.ajax({
+                type: "GET",
+                url: "https://date.nager.at/api/v3/publicholidays/" + yearValue + "/" + countryCode,
+                success: function (data) {
+                    console.log(data);
+                    populateTable(data);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+
+    function populateTable(data) {
+        debugger;
+        var tableBody = $("#tableBody");
+        tableBody.empty();
+
+        data.forEach(function (mudi) {
+            var row = $("<tr>");
+            row.append($("<td>").text(mudi.date));
+            row.append($("<td>").text(mudi.localName));
+            row.append($("<td>").text(mudi.name));
+            row.append($("<td>").text(mudi.countryCode));
+            row.append($("<td>").text(mudi.fixed));
+            row.append($("<td>").text(mudi.global));
+            row.append($("<td>").text(mudi.types.join(', ')));
+            tableBody.append(row);
+        });
+    }
+</script>
